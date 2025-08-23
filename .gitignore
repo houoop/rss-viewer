@@ -1,0 +1,37 @@
+# 用户脚本开发
+# IDE 和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# 构建产物
+dist/
+build/
+*.min.js
+*.map
+
+# 日志
+logs/
+*.log
+
+# 临时文件
+*.tmp
+*.temp
