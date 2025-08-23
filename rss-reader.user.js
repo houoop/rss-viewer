@@ -1,9 +1,21 @@
 // ==UserScript==
-// @name         RSS Reader
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Convert XML RSS feed to a human read RSS interface
-// @author       You
+// @name         RSS Viewer
+// @name:zh-CN   RSS 预览
+// @name:zh-TW   RSS 預覽
+// @name:ja      RSSビューア
+// @name:ko      RSS 뷰어
+// @namespace    https://github.com/houoop/rss-viewer
+// @version      1.0.0
+// @description  Convert XML RSS feed to a human-readable RSS interface with dual-panel layout, theme switching, and responsive design
+// @description:zh-CN 将XML RSS源转换为人类可读的RSS界面，支持双栏布局、主题切换和响应式设计
+// @description:zh-TW 將XML RSS源轉換為人類可讀的RSS界面，支持雙欄佈局、主題切換和響應式設計
+// @description:ja XML RSSフィードを人間が読めるRSSインターフェースに変換、デュアルパネルレイアウト、テーマ切り替え、レスポンシブデザインをサポート
+// @description:ko XML RSS 피드를 인간이 읽을 수 있는 RSS 인터페이스로 변환, 듀얼 패널 레이아웃, 테마 전환, 반응형 디자인 지원
+// @author       houoop
+// @license      MIT
+// @homepage     https://github.com/houoop/rss-viewer
+// @supportURL   https://github.com/houoop/rss-viewer/issues
+// @icon         data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTI0IDEwQzE2LjI2OCAxMCAxMCAxNi4yNjggMTAgMjRDMTAgMzEuNzMyIDE2LjI2OCAzOCAyNCAzOEMzMS43MzIgMzggMzggMzEuNzMyIDM4IDI0QzM4IDE2LjI2OCAzMS43MzIgMTAgMjQgMTBaIiBmaWxsPSIjMjY4NEZGIi8+CjxwYXRoIGQ9Ik0xOCAyMEgzMFYyMkgxOFYyMFoiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTE4IDI2SDMwVjI4SDE4VjI2WiIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCBkPSJNMjAgMzJIMjhWMzRIMjBWMzJaIiBmaWxsPSIjZmZmZmZmIi8+Cjwvc3ZnPgo=
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
 // @connect      raw.githubusercontent.com
@@ -13,6 +25,128 @@
 
 (function () {
   "use strict";
+
+  /*
+   * RSS Viewer - RSS 预览
+   * Version: 1.0.0
+   * Author: houoop
+   * License: MIT
+   * 
+   * 将XML RSS源转换为人类可读的RSS界面
+   * Convert XML RSS feed to a human-readable RSS interface
+   * 
+   * ## 更新日志 | Changelog
+   * 
+   * ### v1.0.0 (2024-08-23)
+   * - 初始版本发布
+   * - 支持RSS/Atom格式解析
+   * - 双栏布局界面
+   * - 明暗主题切换
+   * - 返回顶部按钮
+   * - 响应式设计
+   * - 多语言支持 (中文简体/繁体、英文、日文、韩文)
+   * - 文章预览和分类标签
+   * - 平滑动画效果
+   * 
+   * ## 功能特性 | Features
+   * - 自动检测RSS源并转换为可读界面
+   * - 支持多种RSS格式 (RSS, Atom, XML)
+   * - 双栏布局：左侧文章列表，右侧内容展示
+   * - 明暗主题切换，支持主题记忆
+   * - 响应式设计，适配移动设备
+   * - 多语言界面支持
+   * - 文章预览和分类标签
+   * - 平滑滚动和动画效果
+   * - 自定义滚动条样式
+   */
+
+  // 多语言支持
+  const i18n = {
+    'en': {
+      themeToggle: 'Toggle Theme',
+      settings: 'Settings',
+      backToTop: 'Back to Top',
+      lastUpdate: 'Last Update',
+      author: 'Author',
+      publishTime: 'Published',
+      categories: 'Categories',
+      noDescription: 'No description available',
+      loading: 'Loading RSS feed...',
+      error: 'Error loading RSS feed',
+      articleCount: 'Articles'
+    },
+    'zh-CN': {
+      themeToggle: '切换主题',
+      settings: '设置',
+      backToTop: '返回顶部',
+      lastUpdate: '最后更新',
+      author: '作者',
+      publishTime: '发布时间',
+      categories: '分类',
+      noDescription: '暂无描述',
+      loading: '正在加载RSS源...',
+      error: '加载RSS源出错',
+      articleCount: '篇文章'
+    },
+    'zh-TW': {
+      themeToggle: '切換主題',
+      settings: '設定',
+      backToTop: '返回頂部',
+      lastUpdate: '最後更新',
+      author: '作者',
+      publishTime: '發布時間',
+      categories: '分類',
+      noDescription: '暫無描述',
+      loading: '正在載入RSS源...',
+      error: '載入RSS源出錯',
+      articleCount: '篇文章'
+    },
+    'ja': {
+      themeToggle: 'テーマ切り替え',
+      settings: '設定',
+      backToTop: 'トップに戻る',
+      lastUpdate: '最終更新',
+      author: '著者',
+      publishTime: '公開日時',
+      categories: 'カテゴリ',
+      noDescription: '説明なし',
+      loading: 'RSSフィードを読み込み中...',
+      error: 'RSSフィードの読み込みエラー',
+      articleCount: '記事'
+    },
+    'ko': {
+      themeToggle: '테마 전환',
+      settings: '설정',
+      backToTop: '맨 위로',
+      lastUpdate: '마지막 업데이트',
+      author: '작성자',
+      publishTime: '게시 시간',
+      categories: '카테고리',
+      noDescription: '설명 없음',
+      loading: 'RSS 피드 로딩 중...',
+      error: 'RSS 피드 로딩 오류',
+      articleCount: '개의 글'
+    }
+  };
+
+  // 获取浏览器语言
+  function getBrowserLanguage() {
+    const lang = navigator.language.toLowerCase();
+    if (lang.startsWith('zh')) {
+      return lang.includes('tw') || lang.includes('hk') ? 'zh-TW' : 'zh-CN';
+    } else if (lang.startsWith('ja')) {
+      return 'ja';
+    } else if (lang.startsWith('ko')) {
+      return 'ko';
+    }
+    return 'en';
+  }
+
+  // 获取翻译文本
+  function t(key) {
+    const lang = localStorage.getItem('rss-reader-language') || getBrowserLanguage();
+    return i18n[lang]?.[key] || i18n['en'][key];
+  }
 
   // 检查页面是否是RSS源
   function isRSSFeed() {
@@ -154,13 +288,13 @@
 
     if (article.author) {
       const authorSpan = doc.createElement("span");
-      authorSpan.textContent = `作者: ${article.author}`;
+      authorSpan.textContent = `${t('author')}: ${article.author}`;
       meta.appendChild(authorSpan);
     }
 
     if (article.pubDate) {
       const dateSpan = doc.createElement("span");
-      dateSpan.textContent = `发布时间: ${new Date(
+      dateSpan.textContent = `${t('publishTime')}: ${new Date(
         article.pubDate
       ).toLocaleString()}`;
       meta.appendChild(dateSpan);
@@ -168,7 +302,7 @@
 
     if (article.categories && article.categories.length) {
       const categorySpan = doc.createElement("span");
-      categorySpan.textContent = `分类: ${article.categories.join(", ")}`;
+      categorySpan.textContent = `${t('categories')}: ${article.categories.join(", ")}`;
       meta.appendChild(categorySpan);
     }
 
@@ -227,7 +361,7 @@
         new Date(0)
       );
 
-    feedMeta.textContent = `最后更新: ${latestDate.toLocaleString()}`;
+    feedMeta.textContent = `${t('lastUpdate')}: ${latestDate.toLocaleString()}`;
     headerInfo.appendChild(feedMeta);
 
     // RSS描述
@@ -249,7 +383,7 @@
     const themeToggleBtn = newDoc.createElement("button");
     themeToggleBtn.className = "theme-toggle";
     themeToggleBtn.innerHTML = "🌙";
-    themeToggleBtn.title = "切换主题";
+    themeToggleBtn.title = t('themeToggle');
     themeToggleBtn.addEventListener("click", () => {
       const currentTheme = document.documentElement.getAttribute("data-theme");
       const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -263,7 +397,7 @@
     const settingsButton = newDoc.createElement("button");
     settingsButton.className = "settings-button";
     settingsButton.innerHTML = "⚙️";
-    settingsButton.title = "设置";
+    settingsButton.title = t('settings');
     headerActions.appendChild(settingsButton);
 
     header.appendChild(headerActions);
@@ -302,7 +436,8 @@
       if (item.description) {
         const preview = newDoc.createElement("div");
         preview.className = "article-preview";
-        preview.textContent = item.description.replace(/<[^>]*>/g, '').substring(0, 100) + '...';
+        const cleanDesc = item.description.replace(/<[^>]*>/g, '');
+        preview.textContent = cleanDesc.length > 0 ? cleanDesc.substring(0, 100) + '...' : t('noDescription');
         articleItem.appendChild(preview);
       }
 
@@ -359,7 +494,7 @@
     const backToTop = newDoc.createElement("button");
     backToTop.className = "back-to-top";
     backToTop.innerHTML = "↑";
-    backToTop.title = "返回顶部";
+    backToTop.title = t('backToTop');
     backToTop.addEventListener("click", () => {
       articleContent.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -920,19 +1055,92 @@
 
   // 主函数
   async function init() {
-    // 检查是否是RSS源
-    if (!isRSSFeed()) {
-      return;
-    }
+    try {
+      // 检查是否是RSS源
+      if (!isRSSFeed()) {
+        return;
+      }
 
-    // 提取和解析RSS
-    const feed = await extractRSS();
-    if (!feed) {
-      return;
-    }
+      // 显示加载提示
+      showLoadingMessage();
 
-    // 创建阅读器界面
-    createReaderInterface(feed);
+      // 提取和解析RSS
+      const feed = await extractRSS();
+      if (!feed) {
+        showErrorMessage();
+        return;
+      }
+
+      // 隐藏加载提示
+      hideLoadingMessage();
+
+      // 创建阅读器界面
+      createReaderInterface(feed);
+    } catch (error) {
+      console.error('RSS Viewer initialization error:', error);
+      showErrorMessage();
+    }
+  }
+
+  // 显示加载提示
+  function showLoadingMessage() {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'rss-viewer-loading';
+    loadingDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 8px;
+      font-size: 16px;
+      z-index: 10000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    loadingDiv.textContent = t('loading');
+    document.body.appendChild(loadingDiv);
+  }
+
+  // 隐藏加载提示
+  function hideLoadingMessage() {
+    const loadingDiv = document.getElementById('rss-viewer-loading');
+    if (loadingDiv) {
+      loadingDiv.remove();
+    }
+  }
+
+  // 显示错误提示
+  function showErrorMessage() {
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'rss-viewer-error';
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(244, 67, 54, 0.9);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 8px;
+      font-size: 16px;
+      z-index: 10000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 80%;
+      text-align: center;
+    `;
+    errorDiv.innerHTML = `
+      <div style="font-size: 20px; margin-bottom: 10px;">⚠️</div>
+      <div>${t('error')}</div>
+      <div style="font-size: 12px; margin-top: 10px; opacity: 0.8;">页面将在3秒后刷新...</div>
+    `;
+    document.body.appendChild(errorDiv);
+    
+    // 3秒后刷新页面
+    setTimeout(() => {
+      location.reload();
+    }, 3000);
   }
 
   // 启动程序
