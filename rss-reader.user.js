@@ -15,7 +15,7 @@
 // @license      MIT
 // @homepage     https://github.com/houoop/rss-viewer
 // @supportURL   https://github.com/houoop/rss-viewer/issues
-// @icon         data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTI0IDEwQzE2LjI2OCAxMCAxMCAxNi4yNjggMTAgMjRDMTAgMzEuNzMyIDE2LjI2OCAzOCAyNCAzOEMzMS43MzIgMzggMzggMzEuNzMyIDM4IDI0QzM4IDE2LjI2OCAzMS43MzIgMTAgMjQgMTBaIiBmaWxsPSIjMjY4NEZGIi8+CjxwYXRoIGQ9Ik0xOCAyMEgzMFYyMkgxOFYyMFoiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTE4IDI2SDMwVjI4SDE4VjI2WiIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCBkPSJNMjAgMzJIMjhWMzRIMjBWMzJaIiBmaWxsPSIjZmZmZmZmIi8+Cjwvc3ZnPgo=
+// @icon         data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbyB3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyBmaWxsPSIjMDAwMDAwIiBoZWlnaHQ9IjgwMHB4IiB3aWR0aD0iODAwcHgiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCA0OTAgNDkwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+CjxwYXRoIGQ9Ik0xNDQuODU2LDM0Ni42MjVoMjAuNjA2YzcuNjU2LDAsMTEuNDg0LDMuODg4LDExLjQ4NCwxMS42NjR2MTMuNzQyaDE0LjI5NnYtMTYuNjEzYzAtOS4yNDEtNC4xNzItMTQuMTMxLTEyLjUzMS0xNC42NAoJCXYtMC40OTNjNy42NTYtMS4wNzcsOC45ODctMy4wMDYsMTAuNzM3LTUuODAyYzEuNzUtMi43OTYsMi42MTctOCwyLjYxNy0xNS42MjZjMC04LjM4OS0xLjczNS0xNC4xOTEtNS4yMzQtMTcuMzkxCgkJYy0zLjQ5OS0zLjItOS44NjktNC44LTE5LjExMS00LjhoLTM3LjE2djc1LjM2NmgxNC4yOTZWMzQ2LjYyNXogTTE0NC44NTYsMzA4LjcwMmgyMS41MzNjNC42OCwwLDcuNzE2LDAuNzc4LDkuMDkyLDIuMzMzCgkJYzEuMzc2LDEuNTcsMi4wNjQsNS4wMzksMi4wNjQsMTAuNDIzYzAsNS4yNjQtMC43OTMsOC43NjMtMi4zOTMsMTAuNTEyYy0xLjYsMS43NS00Ljg2LDIuNjE3LTkuNzUsMi42MTdoLTIwLjU0NlYzMDguNzAyeiIvPgo8cGF0aCBkPSJNMjMyLjE3LDM2MS4yMDRjLTguMjEsMC0xMy4yMzQtMC41ODMtMTUuMDg4LTEuNzY0Yy0xLjgzOS0xLjE4MS0yLjc1Mi00LjM5Ni0yLjc1Mi05LjY2bC0wLjA2LTEuNmgtMTMuOTA3bDAuMDQ1LDIuNzUxCgkJYzAsOC43NjMsMS45NDQsMTQuNTgsNS44MzIsMTcuNDUxYzMuODg4LDIuODcxLDExLjc1NCw0LjMwNywyMy41OTcsNC4zMDdjMTMuMTg5LDAsMjEuNzEzLTEuNDY2LDI1LjU3MS00LjM4MQoJCWMzLjg3My0yLjkzMSw1LjgwMi05LjQwNiw1LjgwMi0xOS40MWMwLTguMTM1LTEuNjQ1LTEzLjQ4OC00Ljk1LTE2LjA3NWMtMy4yOS0yLjU3Mi0xMC41NTctNC4xNzItMjEuNzczLTQuOAoJCWMtOS40OTUtMC41MDgtMTUuMTAzLTEuMjU2LTE2Ljc5My0yLjIxM2MtMS42OS0wLjk1Ny0yLjU0Mi0zLjgxMy0yLjU0Mi04LjU1M2MwLTQuMDA4LDEuMDQ3LTYuNjM5LDMuMTI1LTcuODk1CgkJYzIuMDc5LTEuMjU2LDYuNTA1LTEuODg0LDEzLjI3OS0xLjg4NGM1Ljc0MiwwLDkuMzkxLDAuNTUzLDEwLjkzMSwxLjYzYzEuNTQsMS4wOTIsMi40ODIsMy43NTMsMi44MTEsNy45ODUKCQljMCwwLjMyOSwwLjA0NSwwLjgzNywwLjEyLDEuNTRoMTMuOTY3di0yLjg3MWMwLTcuODA2LTEuOTc0LTEzLjA0LTUuOTA3LTE1LjczMWMtMy45NDgtMi42OTItMTEuNTc0LTQuMDM4LTIyLjkyNC00LjAzOAoJCWMtMTEuOTYzLDAtMTkuOTMzLDEuNDY2LTIzLjkyNiw0LjM5NmMtMy45OTMsMi45MTYtNS45OTYsOC43OTMtNS45OTYsMTcuNTg1YzAsOC42MTMsMS42NiwxNC4yMjEsNC45NjUsMTYuODM4CgkJYzMuMzIsMi42MTcsMTAuOTQ2LDQuMjc3LDIyLjg2NCw0Ljk2NWw3Ljg5NSwwLjUwOGM0LjQ1NiwwLjI1NCw3LjM1NywwLjk4Nyw4LjcwMywyLjE4M2MxLjM0NiwxLjE5NiwyLjAxOSwzLjYwNCwyLjAxOSw3LjI1MwoJCWMwLDQuOTM1LTAuODk3LDguMDktMi42NjIsOS40NTFDMjQyLjY1MiwzNjAuNTMyLDIzOC41NywzNjEuMjA0LDIzMi4xNywzNjEuMjA0eiIvPgo8cGF0aCBkPSJNMjk5Ljg1LDM2MS4yMDRjLTguMTk1LDAtMTMuMjE5LTAuNTgzLTE1LjA3My0xLjc2NGMtMS44MzktMS4xODEtMi43NTItNC4zOTYtMi43NTItOS42NmwtMC4wNi0xLjZoLTEzLjkwN2wwLjA0NSwyLjc1MQoJCWMwLDguNzYzLDEuOTQ0LDE0LjU4LDUuODMyLDE3LjQ1MWMzLjg4OCwyLjg3MSwxMS43NTQsNC4zMDcsMjMuNjEyLDQuMzA3YzEzLjE1OSwwLDIxLjY4My0xLjQ2NiwyNS41NzEtNC4zODEKCQljMy44NTgtMi45MzEsNS44MDItOS40MDYsNS44MDItMTkuNDFjMC04LjEzNS0xLjY3NS0xMy40ODgtNC45NjUtMTYuMDc1Yy0zLjI5LTIuNTcyLTEwLjU1Ny00LjE3Mi0yMS43NzMtNC44CgkJYy05LjQ5NS0wLjUwOC0xNS4xMDMtMS4yNTYtMTYuNzkzLTIuMjEzYy0xLjY5LTAuOTU3LTIuNTQyLTMuODEzLTIuNTQyLTguNTUzYzAtNC4wMDgsMS4wNDctNi42MzksMy4xMjUtNy44OTUKCQljMi4wNzktMS4yNTYsNi41MDUtMS44ODQsMTMuMjc5LTEuODg0YzUuNzQyLDAsOS4zOTEsMC41NTMsMTAuOTQ2LDEuNjNjMS41MjUsMS4wOTIsMi40ODIsMy43NTMsMi44MTEsNy45ODUKCQljMCwwLjMyOSwwLjAzLDAuODM3LDAuMTIsMS41NGgxMy45Njd2LTIuODcxYzAtNy44MDYtMS45NzQtMTMuMDQtNS45MjItMTUuNzMxYy0zLjk0OC0yLjY5Mi0xMS41NzQtNC4wMzgtMjIuOTA5LTQuMDM4CgkJYy0xMS45NzgsMC0xOS45NDgsMS40NjYtMjMuOTQxLDQuMzk2Yy0zLjk5MywyLjkxNi01Ljk5Niw4Ljc5My01Ljk5NiwxNy41ODVjMCw4LjYxMywxLjY2LDE0LjIyMSw0Ljk2NSwxNi44MzgKCQljMy4zMiwyLjYxNywxMC45NDYsNC4yNzcsMjIuODc5LDQuOTY1bDcuODk2LDAuNTA4YzQuNDU2LDAuMjU0LDcuMzU3LDAuOTg3LDguNzAzLDIuMTgzYzEuMzE2LDEuMTk2LDIuMDA0LDMuNjA0LDIuMDA0LDcuMjUzCgkJYzAsNC45MzUtMC44OTcsOC4wOS0yLjY2Miw5LjQ1MUMzMTAuMzQ3LDM2MC41MzIsMzA2LjI4LDM2MS4yMDQsMjk5Ljg1LDM2MS4yMDR6Ii8+CjxwYXRoIGQ9Ik03Ny43ODgsMHYyNjUuMTExSDQyLjE4OXYxMzkuNjE1aDAuMDAxbDM1LjU5LDM1LjU5MUw3Ny43ODgsNDkwaDM3MC4wMjNWMTAyLjQyMkwzNDUuMzg4LDBINzcuNzg4eiBNMzk1Ljc5MywzODkuNDEzCgkJSDU3LjUwMXYtMTA4Ljk5aDMzOC4yOTJWMzg5LjQxM3ogTTM1My4wMjIsMzYuOTYybDU3LjgxNiw1Ny44MDRoLTU3LjgxNlYzNi45NjJ6Ii8+CjwvZz4KPC9zdmc+
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
 // @connect      raw.githubusercontent.com
@@ -64,7 +64,6 @@
   const i18n = {
     'en': {
       themeToggle: 'Toggle Theme',
-      settings: 'Settings',
       backToTop: 'Back to Top',
       lastUpdate: 'Last Update',
       author: 'Author',
@@ -75,7 +74,6 @@
     },
     'zh-CN': {
       themeToggle: '切换主题',
-      settings: '设置',
       backToTop: '返回顶部',
       lastUpdate: '最后更新',
       author: '作者',
@@ -86,7 +84,6 @@
     },
     'zh-TW': {
       themeToggle: '切換主題',
-      settings: '設定',
       backToTop: '返回頂部',
       lastUpdate: '最後更新',
       author: '作者',
@@ -97,7 +94,6 @@
     },
     'ja': {
       themeToggle: 'テーマ切り替え',
-      settings: '設定',
       backToTop: 'トップに戻る',
       lastUpdate: '最終更新',
       author: '著者',
@@ -108,7 +104,6 @@
     },
     'ko': {
       themeToggle: '테마 전환',
-      settings: '설정',
       backToTop: '맨 위로',
       lastUpdate: '마지막 업데이트',
       author: '작성자',
@@ -388,13 +383,6 @@
       themeToggleBtn.innerHTML = newTheme === "dark" ? "☀️" : "🌙";
     });
     headerActions.appendChild(themeToggleBtn);
-
-    // 创建设置按钮
-    const settingsButton = newDoc.createElement("button");
-    settingsButton.className = "settings-button";
-    settingsButton.innerHTML = "⚙️";
-    settingsButton.title = t('settings');
-    headerActions.appendChild(settingsButton);
 
     header.appendChild(headerActions);
     container.appendChild(header);
@@ -738,7 +726,7 @@
               background-color: var(--button-primary-hover);
             }
             
-            .settings-button, .theme-toggle {
+            .theme-toggle {
               background-color: var(--button-secondary-bg);
               color: var(--text-primary);
               border: none;
@@ -754,7 +742,7 @@
               height: 40px;
             }
             
-            .settings-button:hover, .theme-toggle:hover {
+            .theme-toggle:hover {
               background-color: var(--button-secondary-hover);
             }
             
