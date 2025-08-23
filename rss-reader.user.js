@@ -11,248 +11,308 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
-    'use strict';
+(function () {
+  "use strict";
 
-    // 检查页面是否是RSS源
-    function isRSSFeed() {
-        // 检查Content-Type
-        const contentType = document.contentType?.toLowerCase() || "";
-        const validContentTypes = [
-            "application/rss+xml",
-            "application/atom+xml",
-            "application/xml",
-            "text/xml",
-            'text/plain' // 有些RSS使用text/plain
-        ];
-        
-        if (validContentTypes.includes(contentType)) {
-            return true
-        }
-        return false
+  // 检查页面是否是RSS源
+  function isRSSFeed() {
+    // 检查Content-Type
+    const contentType = document.contentType?.toLowerCase() || "";
+    const validContentTypes = [
+      "application/rss+xml",
+      "application/atom+xml",
+      "application/xml",
+      "text/xml",
+      "text/plain", // 有些RSS使用text/plain
+    ];
+
+    if (validContentTypes.includes(contentType)) {
+      return true;
     }
+    return false;
+  }
 
+  // 提取和解析RSS内容
+  async function extractRSS() {
+    try {
+      // 获取XML内容
+      let xmlContent;
+      const prettyPrintElement = document.querySelector(
+        "#webkit-xml-viewer-source-xml"
+      );
+      if (prettyPrintElement) {
+        xmlContent = prettyPrintElement.innerHTML;
+      } else {
+        xmlContent = document.body.textContent;
+      }
 
-    // 提取和解析RSS内容
-    async function extractRSS() {
-        try {
-            // 获取XML内容
-            let xmlContent;
-            const prettyPrintElement = document.querySelector("#webkit-xml-viewer-source-xml");
-            if (prettyPrintElement) {
-                xmlContent = prettyPrintElement.innerHTML;
-            } else {
-                xmlContent = document.body.textContent;
+      // 使用RSSParser解析XML
+      const parser = new RSSParser();
+      const parsedFeed = await parser.parseString(xmlContent);
+      console.log("Feed解析结果:", parsedFeed);
+      parsedFeed.items.forEach((item) => {
+        Object.keys(item).forEach((key) => {
+          if (key !== "content:encoded") {
+            if (typeof item[key] === "string") {
+              item[key] = item[key].replace(/&amp;/g, "&");
+              item[key] = item[key].replace(/&lt;/g, "<");
+              item[key] = item[key].replace(/&gt;/g, ">");
+              item[key] = item[key].replace(/&quot;/g, '"');
+              item[key] = item[key].replace(/&apos;/g, "'");
+              item[key] = item[key].replace(/&#039;/g, "'");
+              item[key] = item[key].replace(/&nbsp;/g, " ");
+              item[key] = item[key].replace(/&mdash;/g, "—");
+              item[key] = item[key].replace(/&ndash;/g, "–");
+              item[key] = item[key].replace(/&hellip;/g, "…");
+              item[key] = item[key].replace(/&ldquo;/g, "“");
+              item[key] = item[key].replace(/&rdquo;/g, "”");
+              item[key] = item[key].replace(/&lsquo;/g, "‘");
+              item[key] = item[key].replace(/&rsquo;/g, "’");
+              item[key] = item[key].replace(/&laquo;/g, "«");
+              item[key] = item[key].replace(/&raquo;/g, "»");
+              item[key] = item[key].replace(/&bull;/g, "•");
             }
-
-            // 使用RSSParser解析XML
-            const parser = new RSSParser();
-            const parsedFeed = await parser.parseString(xmlContent);
-            
-            return {
-                title: parsedFeed.title || "RSS Feed",
-                description: parsedFeed.description || "",
-                items: parsedFeed.items.map(item => ({
-                    title: item.title || "",
-                    link: item.link || "",
-                    description: item.contentSnippet || item.description || "",
-                    content: item.content || item["content:encoded"] || "",
-                    pubDate: item.pubDate || item.isoDate || "",
-                    author: item.creator || item.author || "",
-                    categories: item.categories || []
-                }))
-            };
-        } catch (e) {
-            console.error("这不是rss xml", e);
-            return null;
+          }
+        });
+      });
+      //遍历parsedFeed的每个字符属性,如果属性是字符串,则取消转义
+      Object.keys(parsedFeed).forEach((key) => {
+        if (typeof parsedFeed[key] === "string") {
+          parsedFeed[key] = parsedFeed[key].replace(/&amp;/g, "&");
+          parsedFeed[key] = parsedFeed[key].replace(/&lt;/g, "<");
+          parsedFeed[key] = parsedFeed[key].replace(/&gt;/g, ">");
+          parsedFeed[key] = parsedFeed[key].replace(/&quot;/g, '"');
+          parsedFeed[key] = parsedFeed[key].replace(/&apos;/g, "'");
+          parsedFeed[key] = parsedFeed[key].replace(/&#039;/g, "'");
+          parsedFeed[key] = parsedFeed[key].replace(/&nbsp;/g, " ");
+          parsedFeed[key] = parsedFeed[key].replace(/&mdash;/g, "—");
+          parsedFeed[key] = parsedFeed[key].replace(/&ndash;/g, "–");
+          parsedFeed[key] = parsedFeed[key].replace(/&hellip;/g, "…");
+          parsedFeed[key] = parsedFeed[key].replace(/&ldquo;/g, "“");
+          parsedFeed[key] = parsedFeed[key].replace(/&rdquo;/g, "”");
+          parsedFeed[key] = parsedFeed[key].replace(/&lsquo;/g, "‘");
+          parsedFeed[key] = parsedFeed[key].replace(/&rsquo;/g, "’");
+          parsedFeed[key] = parsedFeed[key].replace(/&laquo;/g, "«");
+          parsedFeed[key] = parsedFeed[key].replace(/&raquo;/g, "»");
+          parsedFeed[key] = parsedFeed[key].replace(/&bull;/g, "•");
         }
+      });
+      return {
+        title: parsedFeed.title || "RSS Feed",
+        description: parsedFeed.description || "",
+        items: parsedFeed.items.map((item) => {
+          // 解析转义后的HTML内容
+          const parser = new DOMParser();
+          const content =
+            item["content:encoded"] ||
+            item["content:encodedSnippet"] ||
+            item.content ||
+            item.description ||
+            "";
+          const doc = parser.parseFromString(content, "text/html");
+
+          return {
+            title: item.title || "",
+            link: item.link || "",
+            description: doc.body.innerHTML, // 使用解析后的HTML
+            pubDate: item.pubDate || item.isoDate || "",
+            author: item.creator || item.author || "",
+            categories: item.categories || [],
+          };
+        }),
+      };
+    } catch (e) {
+      console.error("这不是rss xml", e);
+      return null;
+    }
+  }
+
+  // 渲染文章内容
+  function renderArticleContent(article, container, doc) {
+    container.textContent = ""; // 清空容器
+
+    // 创建文章头部
+    const header = doc.createElement("div");
+    header.className = "article-header";
+
+    // 创建标题
+    const title = doc.createElement("h1");
+    title.className = "article-title";
+    title.textContent = article.title;
+    // 添加点击事件打开文章链接
+    if (article.link) {
+      title.style.cursor = "pointer";
+      title.addEventListener("click", () => {
+        window.open(article.link, "_blank");
+      });
+    }
+    header.appendChild(title);
+
+    // 创建元信息
+    const meta = doc.createElement("div");
+    meta.className = "article-meta";
+
+    if (article.author) {
+      const authorSpan = doc.createElement("span");
+      authorSpan.textContent = `作者: ${article.author}`;
+      meta.appendChild(authorSpan);
     }
 
+    if (article.pubDate) {
+      const dateSpan = doc.createElement("span");
+      dateSpan.textContent = `发布时间: ${new Date(
+        article.pubDate
+      ).toLocaleString()}`;
+      meta.appendChild(dateSpan);
+    }
 
-    // 渲染文章内容
-    function renderArticleContent(article, container, doc) {
-        container.textContent = ""; // 清空容器
+    if (article.categories && article.categories.length) {
+      const categorySpan = doc.createElement("span");
+      categorySpan.textContent = `分类: ${article.categories.join(", ")}`;
+      meta.appendChild(categorySpan);
+    }
 
-        // 创建文章头部
-        const header = doc.createElement("div");
-        header.className = "article-header";
+    header.appendChild(meta);
 
-        // 创建标题
-        const title = doc.createElement("h1");
-        title.className = "article-title";
-        title.textContent = article.title;
-        // 添加点击事件打开文章链接
-        if (article.link) {
-            title.style.cursor = "pointer";
-            title.addEventListener("click", () => {
-                window.open(article.link, "_blank");
-            });
+    // 创建文章内容
+    const body = doc.createElement("div");
+    body.className = "article-body";
+
+    // 使用DOMParser来解析文章内容中的HTML
+    const parser = new DOMParser();
+    const contentDoc = parser.parseFromString(
+      article.content || article.description || "",
+      "text/html"
+    );
+    const contentNodes = contentDoc.body.childNodes;
+    contentNodes.forEach((node) => {
+      body.appendChild(doc.importNode(node, true));
+    });
+
+    // 添加所有元素到容器
+    container.appendChild(header);
+    container.appendChild(body);
+  }
+
+  // 创建阅读器界面
+  async function createReaderInterface(rssData) {
+    // 创建新的HTML文档
+    const newDoc = document.implementation.createHTMLDocument();
+    const container = newDoc.createElement("div");
+    container.className = "rss-reader-container";
+
+    // 创建顶部header
+    const header = newDoc.createElement("div");
+    header.className = "reader-header";
+
+    // 创建header信息容器
+    const headerInfo = newDoc.createElement("div");
+    headerInfo.className = "header-info";
+
+    // RSS标题
+    const feedTitle = newDoc.createElement("h1");
+    feedTitle.className = "feed-title";
+    feedTitle.textContent = rssData.title;
+    headerInfo.appendChild(feedTitle);
+
+    // RSS元信息
+    const feedMeta = newDoc.createElement("div");
+    feedMeta.className = "feed-meta";
+
+    // 获取最新的文章日期
+    const latestDate = rssData.items
+      .map((item) => new Date(item.pubDate))
+      .reduce(
+        (latest, current) => (current > latest ? current : latest),
+        new Date(0)
+      );
+
+    feedMeta.textContent = `最后更新: ${latestDate.toLocaleString()}`;
+    headerInfo.appendChild(feedMeta);
+
+    // RSS描述
+    if (rssData.description) {
+      const feedDesc = newDoc.createElement("div");
+      feedDesc.className = "feed-description";
+      feedDesc.textContent = rssData.description;
+      headerInfo.appendChild(feedDesc);
+    }
+
+    // 将header信息容器添加到header
+    header.appendChild(headerInfo);
+    container.appendChild(header);
+
+    // 创建主内容容器
+    const readerContent = newDoc.createElement("div");
+    readerContent.className = "reader-content";
+
+    // 创建左侧文章列表
+    const articleList = newDoc.createElement("div");
+    articleList.className = "article-list";
+
+    // 创建右侧内容区
+    const articleContent = newDoc.createElement("div");
+    articleContent.className = "article-content";
+
+    // 渲染文章列表
+    rssData.items.forEach((item, index) => {
+      const articleItem = newDoc.createElement("div");
+      articleItem.className = "article-item";
+
+      const title = newDoc.createElement("h3");
+      title.textContent = item.title;
+      articleItem.appendChild(title);
+
+      // 添加发布日期
+      const date = newDoc.createElement("div");
+      date.style.fontSize = "12px";
+      date.style.color = "#5f6368";
+      date.style.marginTop = "4px";
+      date.textContent = new Date(item.pubDate).toLocaleDateString();
+      articleItem.appendChild(date);
+
+      // 添加双击事件监听器
+      articleItem.addEventListener("dblclick", () => {
+        if (item.link) {
+          window.open(item.link, "_blank");
         }
-        header.appendChild(title);
+      });
 
-        // 创建元信息
-        const meta = doc.createElement("div");
-        meta.className = "article-meta";
-
-        if (article.author) {
-            const authorSpan = doc.createElement("span");
-            authorSpan.textContent = `作者: ${article.author}`;
-            meta.appendChild(authorSpan);
-        }
-
-        if (article.pubDate) {
-            const dateSpan = doc.createElement("span");
-            dateSpan.textContent = `发布时间: ${new Date(article.pubDate).toLocaleString()}`;
-            meta.appendChild(dateSpan);
-        }
-
-        if (article.categories && article.categories.length) {
-            const categorySpan = doc.createElement("span");
-            categorySpan.textContent = `分类: ${article.categories.join(", ")}`;
-            meta.appendChild(categorySpan);
-        }
-
-        header.appendChild(meta);
-
-        // 创建文章内容
-        const body = doc.createElement("div");
-        body.className = "article-body";
-
-        // 使用DOMParser来解析文章内容中的HTML
-        const parser = new DOMParser();
-        const contentDoc = parser.parseFromString(
-            article.content || article.description || "",
-            "text/html",
-        );
-        const contentNodes = contentDoc.body.childNodes;
-        contentNodes.forEach((node) => {
-            body.appendChild(doc.importNode(node, true));
+      articleItem.addEventListener("click", () => {
+        // 移除其他文章的active状态
+        newDoc.querySelectorAll(".article-item").forEach((item) => {
+          item.classList.remove("active");
         });
 
-        // 添加所有元素到容器
-        container.appendChild(header);
-        container.appendChild(body);
-    }
+        // 添加当前文章的active状态
+        articleItem.classList.add("active");
 
-    // 创建阅读器界面
-    async function createReaderInterface(rssData) {
-        // 创建新的HTML文档
-        const newDoc = document.implementation.createHTMLDocument();
-        const container = newDoc.createElement("div");
-        container.className = "rss-reader-container";
-        
-        // 创建顶部header
-        const header = newDoc.createElement("div");
-        header.className = "reader-header";
-        
-        // 创建header信息容器
-        const headerInfo = newDoc.createElement("div");
-        headerInfo.className = "header-info";
-        
-        // RSS标题
-        const feedTitle = newDoc.createElement("h1");
-        feedTitle.className = "feed-title";
-        feedTitle.textContent = rssData.title;
-        headerInfo.appendChild(feedTitle);
-        
-        // RSS元信息
-        const feedMeta = newDoc.createElement("div");
-        feedMeta.className = "feed-meta";
-        
-        // 获取最新的文章日期
-        const latestDate = rssData.items
-            .map((item) => new Date(item.pubDate))
-            .reduce(
-                (latest, current) => (current > latest ? current : latest),
-                new Date(0),
-            );
-        
-        feedMeta.textContent = `最后更新: ${latestDate.toLocaleString()}`;
-        headerInfo.appendChild(feedMeta);
-        
-        // RSS描述
-        if (rssData.description) {
-            const feedDesc = newDoc.createElement("div");
-            feedDesc.className = "feed-description";
-            feedDesc.textContent = rssData.description;
-            headerInfo.appendChild(feedDesc);
-        }
-        
-        // 将header信息容器添加到header
-        header.appendChild(headerInfo);
-        container.appendChild(header);
-        
-        // 创建主内容容器
-        const readerContent = newDoc.createElement("div");
-        readerContent.className = "reader-content";
-        
-        // 创建左侧文章列表
-        const articleList = newDoc.createElement("div");
-        articleList.className = "article-list";
-        
-        // 创建右侧内容区
-        const articleContent = newDoc.createElement("div");
-        articleContent.className = "article-content";
-        
-        // 渲染文章列表
-        rssData.items.forEach((item, index) => {
-            const articleItem = newDoc.createElement("div");
-            articleItem.className = "article-item";
-            
-            const title = newDoc.createElement("h3");
-            title.textContent = item.title;
-            articleItem.appendChild(title);
-            
-            // 添加发布日期
-            const date = newDoc.createElement("div");
-            date.style.fontSize = "12px";
-            date.style.color = "#5f6368";
-            date.style.marginTop = "4px";
-            date.textContent = new Date(item.pubDate).toLocaleDateString();
-            articleItem.appendChild(date);
-            
-            // 添加双击事件监听器
-            articleItem.addEventListener("dblclick", () => {
-                if (item.link) {
-                    window.open(item.link, "_blank");
-                }
-            });
-            
-            articleItem.addEventListener("click", () => {
-                // 移除其他文章的active状态
-                newDoc.querySelectorAll(".article-item").forEach((item) => {
-                    item.classList.remove("active");
-                });
-                
-                // 添加当前文章的active状态
-                articleItem.classList.add("active");
-                
-                // 更新右侧内容
-                renderArticleContent(item, articleContent, newDoc);
-                
-                // 滚动到顶部
-                articleContent.scrollTop = 0;
-            });
-            
-            articleList.appendChild(articleItem);
-            
-            // 默认显示第一篇文章
-            if (index === 0) {
-                articleItem.classList.add("active");
-                renderArticleContent(item, articleContent, newDoc);
-            }
-        });
-        
-        readerContent.appendChild(articleList);
-        readerContent.appendChild(articleContent);
-        container.appendChild(readerContent);
-        
-        // 清空原有内容并添加阅读器界面
-        document.documentElement.innerHTML = "";
-        
-        // 添加样式到新文档
-        const styleElement = newDoc.createElement('style');
-        styleElement.textContent = `
+        // 更新右侧内容
+        renderArticleContent(item, articleContent, newDoc);
+
+        // 滚动到顶部
+        articleContent.scrollTop = 0;
+      });
+
+      articleList.appendChild(articleItem);
+
+      // 默认显示第一篇文章
+      if (index === 0) {
+        articleItem.classList.add("active");
+        renderArticleContent(item, articleContent, newDoc);
+      }
+    });
+
+    readerContent.appendChild(articleList);
+    readerContent.appendChild(articleContent);
+    container.appendChild(readerContent);
+
+    // 清空原有内容并添加阅读器界面
+    document.documentElement.innerHTML = "";
+
+    // 添加样式到新文档
+    const styleElement = newDoc.createElement("style");
+    styleElement.textContent = `
             /* 主题变量 */
             :root {
               /* 明亮主题 */
@@ -595,31 +655,31 @@
               font-weight: 600;
             }
         `;
-        newDoc.head.appendChild(styleElement);
-        
-        const newBody = newDoc.createElement("body");
-        newBody.appendChild(container);
-        newDoc.documentElement.appendChild(newBody);
-        document.documentElement.appendChild(newDoc.documentElement);
+    newDoc.head.appendChild(styleElement);
+
+    const newBody = newDoc.createElement("body");
+    newBody.appendChild(container);
+    newDoc.documentElement.appendChild(newBody);
+    document.documentElement.appendChild(newDoc.documentElement);
+  }
+
+  // 主函数
+  async function init() {
+    // 检查是否是RSS源
+    if (!isRSSFeed()) {
+      return;
     }
 
-    // 主函数
-    async function init() {
-        // 检查是否是RSS源
-        if (!isRSSFeed()) {
-            return;
-        }
-
-        // 提取和解析RSS
-        const feed = await extractRSS();
-        if (!feed) {
-            return;
-        }
-
-        // 创建阅读器界面
-        createReaderInterface(feed);
+    // 提取和解析RSS
+    const feed = await extractRSS();
+    if (!feed) {
+      return;
     }
 
-    // 启动程序
-    init();
+    // 创建阅读器界面
+    createReaderInterface(feed);
+  }
+
+  // 启动程序
+  init();
 })();
