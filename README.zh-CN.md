@@ -20,7 +20,7 @@
 
 ### 从 Greasy Fork 安装 (推荐)
 
-1. 访问 [RSS Viewer - Greasy Fork](https://greasyfork.org/)
+1. 访问 [RSS Viewer - Greasy Fork](https://greasyfork.org/scripts/546910-rss-viewer)
 2. 点击 "Install this script"
 3. 确认安装到 Tampermonkey 或其他用户脚本管理器
 

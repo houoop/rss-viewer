@@ -20,7 +20,7 @@ An elegant RSS reader userscript that converts XML RSS feeds into a human-readab
 
 ### From Greasy Fork (Recommended)
 
-1. Visit [RSS Viewer - Greasy Fork](https://greasyfork.org/)
+1. Visit [RSS Viewer - Greasy Fork](https://greasyfork.org/scripts/546910-rss-viewer)
 2. Click "Install this script"
 3. Confirm installation to Tampermonkey or other userscript manager
 
