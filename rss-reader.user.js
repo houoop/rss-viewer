@@ -71,8 +71,6 @@
       publishTime: 'Published',
       categories: 'Categories',
       noDescription: 'No description available',
-      loading: 'Loading RSS feed...',
-      error: 'Error loading RSS feed',
       articleCount: 'Articles'
     },
     'zh-CN': {
@@ -84,8 +82,6 @@
       publishTime: '发布时间',
       categories: '分类',
       noDescription: '暂无描述',
-      loading: '正在加载RSS源...',
-      error: '加载RSS源出错',
       articleCount: '篇文章'
     },
     'zh-TW': {
@@ -97,8 +93,6 @@
       publishTime: '發布時間',
       categories: '分類',
       noDescription: '暫無描述',
-      loading: '正在載入RSS源...',
-      error: '載入RSS源出錯',
       articleCount: '篇文章'
     },
     'ja': {
@@ -110,8 +104,6 @@
       publishTime: '公開日時',
       categories: 'カテゴリ',
       noDescription: '説明なし',
-      loading: 'RSSフィードを読み込み中...',
-      error: 'RSSフィードの読み込みエラー',
       articleCount: '記事'
     },
     'ko': {
@@ -123,8 +115,6 @@
       publishTime: '게시 시간',
       categories: '카테고리',
       noDescription: '설명 없음',
-      loading: 'RSS 피드 로딩 중...',
-      error: 'RSS 피드 로딩 오류',
       articleCount: '개의 글'
     }
   };
@@ -169,6 +159,12 @@
   // 提取和解析RSS内容
   async function extractRSS() {
     try {
+      // 检查RSSParser是否可用
+      if (typeof RSSParser === 'undefined') {
+        console.error('RSSParser 未加载，请检查网络连接或脚本管理器设置');
+        return null;
+      }
+
       // 获取XML内容
       let xmlContent;
       const prettyPrintElement = document.querySelector(
@@ -436,9 +432,11 @@
       if (item.description) {
         const preview = newDoc.createElement("div");
         preview.className = "article-preview";
-        const cleanDesc = item.description.replace(/<[^>]*>/g, '');
-        preview.textContent = cleanDesc.length > 0 ? cleanDesc.substring(0, 100) + '...' : t('noDescription');
-        articleItem.appendChild(preview);
+        const cleanDesc = item.description.replace(/<[^>]*>/g, '').trim();
+        if (cleanDesc.length > 0) {
+          preview.textContent = cleanDesc.length > 100 ? cleanDesc.substring(0, 100) + '...' : cleanDesc;
+          articleItem.appendChild(preview);
+        }
       }
 
       // 添加文章分类标签
@@ -1055,92 +1053,20 @@
 
   // 主函数
   async function init() {
-    try {
-      // 检查是否是RSS源
-      if (!isRSSFeed()) {
-        return;
-      }
-
-      // 显示加载提示
-      showLoadingMessage();
-
-      // 提取和解析RSS
-      const feed = await extractRSS();
-      if (!feed) {
-        showErrorMessage();
-        return;
-      }
-
-      // 隐藏加载提示
-      hideLoadingMessage();
-
-      // 创建阅读器界面
-      createReaderInterface(feed);
-    } catch (error) {
-      console.error('RSS Viewer initialization error:', error);
-      showErrorMessage();
+    // 检查是否是RSS源
+    if (!isRSSFeed()) {
+      return;
     }
-  }
 
-  // 显示加载提示
-  function showLoadingMessage() {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'rss-viewer-loading';
-    loadingDiv.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 20px 40px;
-      border-radius: 8px;
-      font-size: 16px;
-      z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    `;
-    loadingDiv.textContent = t('loading');
-    document.body.appendChild(loadingDiv);
-  }
-
-  // 隐藏加载提示
-  function hideLoadingMessage() {
-    const loadingDiv = document.getElementById('rss-viewer-loading');
-    if (loadingDiv) {
-      loadingDiv.remove();
+    // 提取和解析RSS
+    const feed = await extractRSS();
+    if (!feed) {
+      console.log('这不是RSS XML页面');
+      return;
     }
-  }
 
-  // 显示错误提示
-  function showErrorMessage() {
-    const errorDiv = document.createElement('div');
-    errorDiv.id = 'rss-viewer-error';
-    errorDiv.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(244, 67, 54, 0.9);
-      color: white;
-      padding: 20px 40px;
-      border-radius: 8px;
-      font-size: 16px;
-      z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: 80%;
-      text-align: center;
-    `;
-    errorDiv.innerHTML = `
-      <div style="font-size: 20px; margin-bottom: 10px;">⚠️</div>
-      <div>${t('error')}</div>
-      <div style="font-size: 12px; margin-top: 10px; opacity: 0.8;">页面将在3秒后刷新...</div>
-    `;
-    document.body.appendChild(errorDiv);
-    
-    // 3秒后刷新页面
-    setTimeout(() => {
-      location.reload();
-    }, 3000);
+    // 创建阅读器界面
+    createReaderInterface(feed);
   }
 
   // 启动程序
