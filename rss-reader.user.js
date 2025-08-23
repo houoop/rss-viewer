@@ -240,6 +240,33 @@
 
     // 将header信息容器添加到header
     header.appendChild(headerInfo);
+
+    // 创建头部操作按钮容器
+    const headerActions = newDoc.createElement("div");
+    headerActions.className = "header-actions";
+
+    // 创建主题切换按钮
+    const themeToggleBtn = newDoc.createElement("button");
+    themeToggleBtn.className = "theme-toggle";
+    themeToggleBtn.innerHTML = "🌙";
+    themeToggleBtn.title = "切换主题";
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("rss-reader-theme", newTheme);
+      themeToggleBtn.innerHTML = newTheme === "dark" ? "☀️" : "🌙";
+    });
+    headerActions.appendChild(themeToggleBtn);
+
+    // 创建设置按钮
+    const settingsButton = newDoc.createElement("button");
+    settingsButton.className = "settings-button";
+    settingsButton.innerHTML = "⚙️";
+    settingsButton.title = "设置";
+    headerActions.appendChild(settingsButton);
+
+    header.appendChild(headerActions);
     container.appendChild(header);
 
     // 创建主内容容器
@@ -270,6 +297,27 @@
       date.style.marginTop = "4px";
       date.textContent = new Date(item.pubDate).toLocaleDateString();
       articleItem.appendChild(date);
+
+      // 添加文章描述预览
+      if (item.description) {
+        const preview = newDoc.createElement("div");
+        preview.className = "article-preview";
+        preview.textContent = item.description.replace(/<[^>]*>/g, '').substring(0, 100) + '...';
+        articleItem.appendChild(preview);
+      }
+
+      // 添加文章分类标签
+      if (item.categories && item.categories.length > 0) {
+        const categories = newDoc.createElement("div");
+        categories.className = "article-categories";
+        item.categories.forEach(category => {
+          const tag = newDoc.createElement("span");
+          tag.className = "category-tag";
+          tag.textContent = category;
+          categories.appendChild(tag);
+        });
+        articleItem.appendChild(categories);
+      }
 
       // 添加双击事件监听器
       articleItem.addEventListener("dblclick", () => {
@@ -306,6 +354,16 @@
     readerContent.appendChild(articleList);
     readerContent.appendChild(articleContent);
     container.appendChild(readerContent);
+
+    // 创建返回顶部按钮
+    const backToTop = newDoc.createElement("button");
+    backToTop.className = "back-to-top";
+    backToTop.innerHTML = "↑";
+    backToTop.title = "返回顶部";
+    backToTop.addEventListener("click", () => {
+      articleContent.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    container.appendChild(backToTop);
 
     // 清空原有内容并添加阅读器界面
     document.documentElement.innerHTML = "";
@@ -654,6 +712,181 @@
               line-height: 1.3;
               font-weight: 600;
             }
+            
+            /* 返回顶部按钮 */
+            .back-to-top {
+              position: fixed;
+              bottom: 30px;
+              right: 30px;
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              background-color: var(--button-primary-bg);
+              color: white;
+              border: none;
+              font-size: 20px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 4px 12px var(--shadow-color);
+              transition: all 0.3s ease;
+              opacity: 0;
+              visibility: hidden;
+              transform: translateY(20px);
+              z-index: 1000;
+            }
+            
+            .back-to-top.visible {
+              opacity: 1;
+              visibility: visible;
+              transform: translateY(0);
+            }
+            
+            .back-to-top:hover {
+              background-color: var(--button-primary-hover);
+              transform: translateY(-2px);
+              box-shadow: 0 6px 16px var(--shadow-color);
+            }
+            
+            /* 文章列表项更多样式 */
+            .article-item {
+              position: relative;
+              padding: 16px;
+              border-bottom: 1px solid var(--border-color);
+              cursor: pointer;
+              transition: all 0.2s ease;
+              overflow: hidden;
+            }
+            
+            .article-item::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 3px;
+              height: 0;
+              background-color: var(--active-border);
+              transition: height 0.3s ease;
+            }
+            
+            .article-item:hover::before {
+              height: 100%;
+            }
+            
+            .article-item.active {
+              background: var(--hover-bg);
+              border-left: 4px solid var(--active-border);
+            }
+            
+            /* 添加文章描述预览 */
+            .article-preview {
+              font-size: 13px;
+              color: var(--text-secondary);
+              margin-top: 8px;
+              line-height: 1.4;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            
+            /* 添加文章分类标签 */
+            .article-categories {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 6px;
+              margin-top: 8px;
+            }
+            
+            .category-tag {
+              background-color: var(--bg-secondary);
+              color: var(--text-secondary);
+              padding: 2px 8px;
+              border-radius: 12px;
+              font-size: 11px;
+              border: 1px solid var(--border-color);
+            }
+            
+            /* 添加文章阅读进度指示器 */
+            .article-list::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 3px;
+              background: linear-gradient(90deg, var(--active-border) 0%, transparent 100%);
+              transform-origin: left;
+              transform: scaleX(0);
+              transition: transform 0.3s ease;
+            }
+            
+            /* 添加加载动画 */
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            
+            .article-item {
+              animation: fadeIn 0.5s ease forwards;
+            }
+            
+            .article-item:nth-child(1) { animation-delay: 0.1s; }
+            .article-item:nth-child(2) { animation-delay: 0.2s; }
+            .article-item:nth-child(3) { animation-delay: 0.3s; }
+            .article-item:nth-child(4) { animation-delay: 0.4s; }
+            .article-item:nth-child(5) { animation-delay: 0.5s; }
+            
+            /* 响应式设计优化 */
+            @media (max-width: 768px) {
+              .article-list {
+                width: 280px;
+              }
+              
+              .article-content {
+                padding: 20px;
+              }
+              
+              .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+              }
+              
+              .reader-header {
+                padding: 15px;
+              }
+              
+              .feed-title {
+                font-size: 20px;
+              }
+            }
+            
+            @media (max-width: 480px) {
+              .reader-content {
+                flex-direction: column;
+              }
+              
+              .article-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 300px;
+              }
+              
+              .article-content {
+                padding: 15px;
+              }
+            }
         `;
     newDoc.head.appendChild(styleElement);
 
@@ -661,6 +894,28 @@
     newBody.appendChild(container);
     newDoc.documentElement.appendChild(newBody);
     document.documentElement.appendChild(newDoc.documentElement);
+
+    // 初始化主题
+    const savedTheme = localStorage.getItem("rss-reader-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    const themeToggleElement = document.querySelector(".theme-toggle");
+    if (themeToggleElement) {
+      themeToggleElement.innerHTML = savedTheme === "dark" ? "☀️" : "🌙";
+    }
+
+    // 返回顶部按钮显示/隐藏逻辑
+    const backToTopButton = document.querySelector(".back-to-top");
+    const articleContentElement = document.querySelector(".article-content");
+    
+    if (backToTopButton && articleContentElement) {
+      articleContentElement.addEventListener("scroll", () => {
+        if (articleContentElement.scrollTop > 300) {
+          backToTopButton.classList.add("visible");
+        } else {
+          backToTopButton.classList.remove("visible");
+        }
+      });
+    }
   }
 
   // 主函数
