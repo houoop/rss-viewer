@@ -31,12 +31,12 @@
    * Version: 1.0.0
    * Author: houoop
    * License: MIT
-   * 
+   *
    * 将XML RSS源转换为人类可读的RSS界面
    * Convert XML RSS feed to a human-readable RSS interface
-   * 
+   *
    * ## 更新日志 | Changelog
-   * 
+   *
    * ### v1.0.0 (2024-08-23)
    * - 初始版本发布
    * - 支持RSS/Atom格式解析
@@ -47,7 +47,7 @@
    * - 多语言支持 (中文简体/繁体、英文、日文、韩文)
    * - 文章预览和分类标签
    * - 平滑动画效果
-   * 
+   *
    * ## 功能特性 | Features
    * - 自动检测RSS源并转换为可读界面
    * - 支持多种RSS格式 (RSS, Atom, XML)
@@ -62,75 +62,76 @@
 
   // 多语言支持
   const i18n = {
-    'en': {
-      themeToggle: 'Toggle Theme',
-      backToTop: 'Back to Top',
-      lastUpdate: 'Last Update',
-      author: 'Author',
-      publishTime: 'Published',
-      categories: 'Categories',
-      noDescription: 'No description available',
-      articleCount: 'Articles'
+    en: {
+      themeToggle: "Toggle Theme",
+      backToTop: "Back to Top",
+      lastUpdate: "Last Update",
+      author: "Author",
+      publishTime: "Published",
+      categories: "Categories",
+      noDescription: "No description available",
+      articleCount: "Articles",
     },
-    'zh-CN': {
-      themeToggle: '切换主题',
-      backToTop: '返回顶部',
-      lastUpdate: '最后更新',
-      author: '作者',
-      publishTime: '发布时间',
-      categories: '分类',
-      noDescription: '暂无描述',
-      articleCount: '篇文章'
+    "zh-CN": {
+      themeToggle: "切换主题",
+      backToTop: "返回顶部",
+      lastUpdate: "最后更新",
+      author: "作者",
+      publishTime: "发布时间",
+      categories: "分类",
+      noDescription: "暂无描述",
+      articleCount: "篇文章",
     },
-    'zh-TW': {
-      themeToggle: '切換主題',
-      backToTop: '返回頂部',
-      lastUpdate: '最後更新',
-      author: '作者',
-      publishTime: '發布時間',
-      categories: '分類',
-      noDescription: '暫無描述',
-      articleCount: '篇文章'
+    "zh-TW": {
+      themeToggle: "切換主題",
+      backToTop: "返回頂部",
+      lastUpdate: "最後更新",
+      author: "作者",
+      publishTime: "發布時間",
+      categories: "分類",
+      noDescription: "暫無描述",
+      articleCount: "篇文章",
     },
-    'ja': {
-      themeToggle: 'テーマ切り替え',
-      backToTop: 'トップに戻る',
-      lastUpdate: '最終更新',
-      author: '著者',
-      publishTime: '公開日時',
-      categories: 'カテゴリ',
-      noDescription: '説明なし',
-      articleCount: '記事'
+    ja: {
+      themeToggle: "テーマ切り替え",
+      backToTop: "トップに戻る",
+      lastUpdate: "最終更新",
+      author: "著者",
+      publishTime: "公開日時",
+      categories: "カテゴリ",
+      noDescription: "説明なし",
+      articleCount: "記事",
     },
-    'ko': {
-      themeToggle: '테마 전환',
-      backToTop: '맨 위로',
-      lastUpdate: '마지막 업데이트',
-      author: '작성자',
-      publishTime: '게시 시간',
-      categories: '카테고리',
-      noDescription: '설명 없음',
-      articleCount: '개의 글'
-    }
+    ko: {
+      themeToggle: "테마 전환",
+      backToTop: "맨 위로",
+      lastUpdate: "마지막 업데이트",
+      author: "작성자",
+      publishTime: "게시 시간",
+      categories: "카테고리",
+      noDescription: "설명 없음",
+      articleCount: "개의 글",
+    },
   };
 
   // 获取浏览器语言
   function getBrowserLanguage() {
     const lang = navigator.language.toLowerCase();
-    if (lang.startsWith('zh')) {
-      return lang.includes('tw') || lang.includes('hk') ? 'zh-TW' : 'zh-CN';
-    } else if (lang.startsWith('ja')) {
-      return 'ja';
-    } else if (lang.startsWith('ko')) {
-      return 'ko';
+    if (lang.startsWith("zh")) {
+      return lang.includes("tw") || lang.includes("hk") ? "zh-TW" : "zh-CN";
+    } else if (lang.startsWith("ja")) {
+      return "ja";
+    } else if (lang.startsWith("ko")) {
+      return "ko";
     }
-    return 'en';
+    return "en";
   }
 
   // 获取翻译文本
   function t(key) {
-    const lang = localStorage.getItem('rss-reader-language') || getBrowserLanguage();
-    return i18n[lang]?.[key] || i18n['en'][key];
+    const lang =
+      localStorage.getItem("rss-reader-language") || getBrowserLanguage();
+    return i18n[lang]?.[key] || i18n["en"][key];
   }
 
   // 检查页面是否是RSS源
@@ -155,20 +156,38 @@
   async function extractRSS() {
     try {
       // 检查RSSParser是否可用
-      if (typeof RSSParser === 'undefined') {
-        console.error('RSSParser 未加载，请检查网络连接或脚本管理器设置');
+      if (typeof RSSParser === "undefined") {
+        console.error("RSSParser 未加载，请检查网络连接或脚本管理器设置");
         return null;
       }
 
       // 获取XML内容
       let xmlContent;
-      const prettyPrintElement = document.querySelector(
-        "#webkit-xml-viewer-source-xml"
-      );
-      if (prettyPrintElement) {
-        xmlContent = prettyPrintElement.innerHTML;
-      } else {
-        xmlContent = document.body.textContent;
+      switch (document.contentType) {
+        case "application/rss+xml":
+          xmlContent = document.querySelector(
+            "#webkit-xml-viewer-source-xml"
+          ).innerHTML;
+          break;
+        case "application/atom+xml":
+          xmlContent = document.querySelector(
+            "#webkit-xml-viewer-source-xml"
+          ).innerHTML;
+          break;
+        case "application/xml":
+          xmlContent = document.querySelector(
+            "#webkit-xml-viewer-source-xml"
+          ).innerHTML;
+          break;
+        case "text/xml":
+          xmlContent = new XMLSerializer().serializeToString(document);
+          break;
+        case "text/plain":
+          xmlContent = document.body.textContent;
+          break;
+        default:
+          console.warn("未知的Content-Type，尝试提取页面内容");
+          xmlContent = document.body.textContent;
       }
 
       // 使用RSSParser解析XML
@@ -226,20 +245,15 @@
         title: parsedFeed.title || "RSS Feed",
         description: parsedFeed.description || "",
         items: parsedFeed.items.map((item) => {
-          // 解析转义后的HTML内容
-          const parser = new DOMParser();
-          const content =
-            item["content:encoded"] ||
-            item["content:encodedSnippet"] ||
-            item.content ||
-            item.description ||
-            "";
-          const doc = parser.parseFromString(content, "text/html");
-
           return {
             title: item.title || "",
             link: item.link || "",
-            description: doc.body.innerHTML, // 使用解析后的HTML
+            content:
+              item["content:encoded"] ||
+              item["content:encodedSnippet"] ||
+              item.content ||
+              "",
+            description: item.description || "",
             pubDate: item.pubDate || item.isoDate || "",
             author: item.creator || item.author || "",
             categories: item.categories || [],
@@ -250,6 +264,24 @@
       console.error("这不是rss xml", e);
       return null;
     }
+  }
+
+  // 安全地清理和解析HTML内容
+  function cleanHTMLContent(html) {
+    if (!html) return "";
+
+    // 移除不安全的标签
+    let cleanedHTML = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "") // 移除script标签
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "") // 移除style标签
+      .replace(/<meta[^>]*>/gi, "") // 移除meta标签
+      .replace(/<link[^>]*>/gi, "") // 移除link标签
+      .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, "") // 移除iframe标签
+      .replace(/on\w+="[^"]*"/g, "") // 移除事件处理器
+      .replace(/on\w+='[^']*'/g, "") // 移除事件处理器
+      .replace(/javascript:[^"']*/gi, ""); // 移除javascript协议
+
+    return cleanedHTML;
   }
 
   // 渲染文章内容
@@ -279,13 +311,13 @@
 
     if (article.author) {
       const authorSpan = doc.createElement("span");
-      authorSpan.textContent = `${t('author')}: ${article.author}`;
+      authorSpan.textContent = `${t("author")}: ${article.author}`;
       meta.appendChild(authorSpan);
     }
 
     if (article.pubDate) {
       const dateSpan = doc.createElement("span");
-      dateSpan.textContent = `${t('publishTime')}: ${new Date(
+      dateSpan.textContent = `${t("publishTime")}: ${new Date(
         article.pubDate
       ).toLocaleString()}`;
       meta.appendChild(dateSpan);
@@ -293,7 +325,9 @@
 
     if (article.categories && article.categories.length) {
       const categorySpan = doc.createElement("span");
-      categorySpan.textContent = `${t('categories')}: ${article.categories.join(", ")}`;
+      categorySpan.textContent = `${t("categories")}: ${article.categories.join(
+        ", "
+      )}`;
       meta.appendChild(categorySpan);
     }
 
@@ -303,13 +337,26 @@
     const body = doc.createElement("div");
     body.className = "article-body";
 
-    // 使用DOMParser来解析文章内容中的HTML
-    const parser = new DOMParser();
-    const contentDoc = parser.parseFromString(
-      article.content || article.description || "",
-      "text/html"
+    const contentToParse = cleanHTMLContent(
+      article.content || article.description || ""
     );
-    const contentNodes = contentDoc.body.childNodes;
+
+    // 使用沙箱环境来解析HTML内容，避免TrustedHTML错误
+    let contentNodes;
+    try {
+      // 尝试使用沙箱文档
+      const sandbox = document.implementation.createHTMLDocument('sandbox');
+      const sandboxDiv = sandbox.createElement('div');
+      sandboxDiv.innerHTML = contentToParse;
+      contentNodes = sandboxDiv.childNodes;
+    } catch (error) {
+      // console.warn("沙箱解析失败，使用纯文本:", error);
+      // 如果沙箱也失败，创建纯文本节点
+      const textNode = doc.createTextNode(contentToParse.replace(/<[^>]*>/g, ''));
+      contentNodes = [textNode];
+    }
+    
+    // 将节点导入到目标文档
     contentNodes.forEach((node) => {
       body.appendChild(doc.importNode(node, true));
     });
@@ -352,7 +399,7 @@
         new Date(0)
       );
 
-    feedMeta.textContent = `${t('lastUpdate')}: ${latestDate.toLocaleString()}`;
+    feedMeta.textContent = `${t("lastUpdate")}: ${latestDate.toLocaleString()}`;
     headerInfo.appendChild(feedMeta);
 
     // RSS描述
@@ -373,14 +420,14 @@
     // 创建主题切换按钮
     const themeToggleBtn = newDoc.createElement("button");
     themeToggleBtn.className = "theme-toggle";
-    themeToggleBtn.innerHTML = "🌙";
-    themeToggleBtn.title = t('themeToggle');
+    themeToggleBtn.textContent = "🌙";
+    themeToggleBtn.title = t("themeToggle");
     themeToggleBtn.addEventListener("click", () => {
       const currentTheme = document.documentElement.getAttribute("data-theme");
       const newTheme = currentTheme === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", newTheme);
       localStorage.setItem("rss-reader-theme", newTheme);
-      themeToggleBtn.innerHTML = newTheme === "dark" ? "☀️" : "🌙";
+      themeToggleBtn.textContent = newTheme === "dark" ? "☀️" : "🌙";
     });
     headerActions.appendChild(themeToggleBtn);
 
@@ -420,9 +467,14 @@
       if (item.description) {
         const preview = newDoc.createElement("div");
         preview.className = "article-preview";
-        const cleanDesc = item.description.replace(/<[^>]*>/g, '').trim();
+        const cleanDesc = cleanHTMLContent(item.description)
+          .replace(/<[^>]*>/g, "")
+          .trim();
         if (cleanDesc.length > 0) {
-          preview.textContent = cleanDesc.length > 100 ? cleanDesc.substring(0, 100) + '...' : cleanDesc;
+          preview.textContent =
+            cleanDesc.length > 100
+              ? cleanDesc.substring(0, 100) + "..."
+              : cleanDesc;
           articleItem.appendChild(preview);
         }
       }
@@ -431,7 +483,7 @@
       if (item.categories && item.categories.length > 0) {
         const categories = newDoc.createElement("div");
         categories.className = "article-categories";
-        item.categories.forEach(category => {
+        item.categories.forEach((category) => {
           const tag = newDoc.createElement("span");
           tag.className = "category-tag";
           tag.textContent = category;
@@ -479,15 +531,17 @@
     // 创建返回顶部按钮
     const backToTop = newDoc.createElement("button");
     backToTop.className = "back-to-top";
-    backToTop.innerHTML = "↑";
-    backToTop.title = t('backToTop');
+    backToTop.textContent = "↑";
+    backToTop.title = t("backToTop");
     backToTop.addEventListener("click", () => {
       articleContent.scrollTo({ top: 0, behavior: "smooth" });
     });
     container.appendChild(backToTop);
 
     // 清空原有内容并添加阅读器界面
-    document.documentElement.innerHTML = "";
+    while (document.documentElement.firstChild) {
+      document.documentElement.removeChild(document.documentElement.firstChild);
+    }
 
     // 添加样式到新文档
     const styleElement = newDoc.createElement("style");
@@ -1021,13 +1075,13 @@
     document.documentElement.setAttribute("data-theme", savedTheme);
     const themeToggleElement = document.querySelector(".theme-toggle");
     if (themeToggleElement) {
-      themeToggleElement.innerHTML = savedTheme === "dark" ? "☀️" : "🌙";
+      themeToggleElement.textContent = savedTheme === "dark" ? "☀️" : "🌙";
     }
 
     // 返回顶部按钮显示/隐藏逻辑
     const backToTopButton = document.querySelector(".back-to-top");
     const articleContentElement = document.querySelector(".article-content");
-    
+
     if (backToTopButton && articleContentElement) {
       articleContentElement.addEventListener("scroll", () => {
         if (articleContentElement.scrollTop > 300) {
@@ -1049,7 +1103,7 @@
     // 提取和解析RSS
     const feed = await extractRSS();
     if (!feed) {
-      console.log('这不是RSS XML页面');
+      console.log("这不是RSS XML页面");
       return;
     }
 
