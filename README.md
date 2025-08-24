@@ -16,6 +16,16 @@ An elegant RSS reader userscript that converts XML RSS feeds into a human-readab
 - ⬆️ **Back to Top**: Convenient back to top button
 - 📜 **Format Support**: Supports RSS, Atom, XML formats
 
+## 📸 Screenshots
+
+### Before & After Comparison
+
+| Original XML View | RSS Reader View |
+|-------------------|-----------------|
+| ![XML Code View](screenshot/xml%20code%20view.jpg) | ![RSS Reader View](screenshot/rss%20reader%20view.jpg) |
+
+**Transform your RSS reading experience** - From raw XML code to an elegant, readable interface with just one click!
+
 ## 🚀 Installation
 
 ### From Greasy Fork (Recommended)
