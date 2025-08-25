@@ -160,34 +160,38 @@
         console.error("RSSParser 未加载，请检查网络连接或脚本管理器设置");
         return null;
       }
-
       // 获取XML内容
       let xmlContent;
-      switch (document.contentType) {
-        case "application/rss+xml":
-          xmlContent = document.querySelector(
-            "#webkit-xml-viewer-source-xml"
-          ).innerHTML;
-          break;
-        case "application/atom+xml":
-          xmlContent = document.querySelector(
-            "#webkit-xml-viewer-source-xml"
-          ).innerHTML;
-          break;
-        case "application/xml":
-          xmlContent = document.querySelector(
-            "#webkit-xml-viewer-source-xml"
-          ).innerHTML;
-          break;
-        case "text/xml":
-          xmlContent = new XMLSerializer().serializeToString(document);
-          break;
-        case "text/plain":
-          xmlContent = document.body.textContent;
-          break;
-        default:
-          console.warn("未知的Content-Type，尝试提取页面内容");
-          xmlContent = document.body.textContent;
+      let prettyPrint = document.querySelector("#webkit-xml-viewer-source-xml");
+      if (prettyPrint) {
+        xmlContent = prettyPrint.innerHTML;
+      } else {
+        switch (document.contentType) {
+          // case "application/rss+xml":
+          //   xmlContent = document.querySelector(
+          //     "#webkit-xml-viewer-source-xml"
+          //   ).innerHTML;
+          //   break;
+          // case "application/atom+xml":
+          //   xmlContent = document.querySelector(
+          //     "#webkit-xml-viewer-source-xml"
+          //   ).innerHTML;
+          //   break;
+          // case "application/xml":
+          //   xmlContent = document.querySelector(
+          //     "#webkit-xml-viewer-source-xml"
+          //   ).innerHTML;
+          //   break;
+          case "text/xml":
+            xmlContent = new XMLSerializer().serializeToString(document);
+            break;
+          case "text/plain":
+            xmlContent = document.body.textContent;
+            break;
+          default:
+            console.warn("未知的Content-Type，尝试提取页面内容");
+            xmlContent = document.body.textContent;
+        }
       }
 
       // 使用RSSParser解析XML
@@ -345,17 +349,19 @@
     let contentNodes;
     try {
       // 尝试使用沙箱文档
-      const sandbox = document.implementation.createHTMLDocument('sandbox');
-      const sandboxDiv = sandbox.createElement('div');
+      const sandbox = document.implementation.createHTMLDocument("sandbox");
+      const sandboxDiv = sandbox.createElement("div");
       sandboxDiv.innerHTML = contentToParse;
       contentNodes = sandboxDiv.childNodes;
     } catch (error) {
       // console.warn("沙箱解析失败，使用纯文本:", error);
       // 如果沙箱也失败，创建纯文本节点
-      const textNode = doc.createTextNode(contentToParse.replace(/<[^>]*>/g, ''));
+      const textNode = doc.createTextNode(
+        contentToParse.replace(/<[^>]*>/g, "")
+      );
       contentNodes = [textNode];
     }
-    
+
     // 将节点导入到目标文档
     contentNodes.forEach((node) => {
       body.appendChild(doc.importNode(node, true));
